@@ -74,7 +74,7 @@ class YoutubeBot(Bot):
 
     def handle_message(self, message):
 
-        if self.current_msg.
+
 
 
         if self.is_current_msg_photo():
