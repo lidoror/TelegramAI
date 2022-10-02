@@ -48,15 +48,13 @@ class Bot:
 
         file_info = self.bot.get_file(self.current_msg.photo[quality].file_id)
         data = self.bot.download_file(file_info.file_path)
-        folder = file_info.file_path.split('/')[0]
+        folder_name = file_info.file_path.split('/')[0]
 
-        if not os.path.exists(folder):
-            os.makedirs(folder)
+        if not os.path.exists(folder_name):
+            os.makedirs(folder_name)
 
         with open(file_info.file_path, 'wb') as photo:
             photo.write(data)
-
-
 
     def handle_message(self, message):
         """Bot Main message handler"""
@@ -71,20 +69,44 @@ class QuoteBot(Bot):
 
 
 class YoutubeBot(Bot):
+    """
+    the class getting message and searching in youtube for videos that have the same name as the message
+    """
 
     def handle_message(self, message):
-
-
-
-
+        """
+        youtube bot message handler
+        """
         if self.is_current_msg_photo():
             self.download_user_photo(quality=3)
             return
 
-        video = search_download_youtube_video(message.text)
-        video_link = video[0].get("url")
-        self.send_text(video_link)
+        video = self.download_video_from_youtube(message)
+        self.send_text(self.get_downloaded_video_link(video))
 
+    def send_video(self, message, path):
+
+        video = open(path, 'rb')
+        self.bot.send_video(message.chat.id, video)
+
+    def download_video_from_youtube(self, message):
+        """
+        ":param: message: the message sent from the user
+        this method downloads video from youtube
+        :return: the downloaded video
+        """
+
+        video = search_download_youtube_video(message.text)
+        return video
+
+    def get_downloaded_video_link(self, video):
+        """
+        :param: video: video sent to the method
+        this method gets video
+        :return: url of teh video
+        """
+        video_link = video[0].get("url")
+        return video_link
 
 
 if __name__ == '__main__':
