@@ -56,6 +56,8 @@ class Bot:
         with open(file_info.file_path, 'wb') as photo:
             photo.write(data)
 
+        return file_info
+
     def handle_message(self, message):
         """Bot Main message handler"""
         logger.info(f'Incoming message: {message}')
@@ -73,21 +75,40 @@ class YoutubeBot(Bot):
     the class getting message and searching in youtube for videos that have the same name as the message
     """
 
+    def __init__(self, token):
+        super().__init__(token)
+        self.cache = {}
+
     def handle_message(self, message):
         """
         youtube bot message handler
         """
+
         if self.is_current_msg_photo():
             self.download_user_photo(quality=3)
             return
 
+
+        if message.text in self.cache:
+            file_path = os.path.join('./', self.cache.get(message.text))
+            if self.file_exist(file_path):
+                self.send_video(message, file_path)
+                return
+
         video = self.download_video_from_youtube(message)
+        self.cache[message.text] = video[0].get('filename')
         self.send_text(self.get_downloaded_video_link(video))
 
-    def send_video(self, message, path):
+    def file_exist(self, file_path):
+        return os.path.exists(file_path)
 
+    def send_video(self, message, path):
         video = open(path, 'rb')
         self.bot.send_video(message.chat.id, video)
+
+    def send_photo(self, message, path):
+        photo = open(path, 'rb')
+        self.bot.send_photo(message.chat.id, photo)
 
     def download_video_from_youtube(self, message):
         """
