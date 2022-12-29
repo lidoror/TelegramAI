@@ -6,7 +6,8 @@ from loguru import logger
 
 def calc_backlog_per_instance():
     msgs_in_queue = int(workers_queue.attributes.get('ApproximateNumberOfMessages'))
-    asg_groups = asg_client.describe_auto_scaling_groups(AutoScalingGroupNames=[autoscaling_group_name])['AutoScalingGroups']
+    asg_groups = asg_client.describe_auto_scaling_groups(AutoScalingGroupNames=[autoscaling_group_name])[
+        'AutoScalingGroups']
 
     if not asg_groups:
         raise RuntimeError('Autoscaling group not found')
@@ -28,20 +29,24 @@ def main():
         backlog_per_instance = calc_backlog_per_instance()
         logger.info(f'backlog per instance: {backlog_per_instance}')
 
-        # TODO send the backlog_per_instance metric to cloudwatch
+        client = boto3.client('cloudwatch')
+        client.put_metric_data(backlog_per_instance)
 
         time.sleep(60)
 
 
 if __name__ == '__main__':
-    with open('../config.json') as f:
+    with open('config.json') as f:
         config = json.load(f)
 
     bot_to_worker_queue_name = config.get('bot_to_worker_queue_name')
     autoscaling_group_name = config.get('autoscaling_group_name')
 
     sqs = boto3.resource('sqs')
+
     workers_queue = sqs.get_queue_by_name(QueueName=bot_to_worker_queue_name)
     asg_client = boto3.client('autoscaling')
 
     main()
+
+

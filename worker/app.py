@@ -1,10 +1,10 @@
 import json
+import os
 import time
 import boto3
 from botocore.exceptions import ClientError
 from loguru import logger
 from utils import search_download_youtube_video
-
 
 with open('config.json') as f:
     config = json.load(f)
@@ -16,9 +16,15 @@ queue = sqs.get_queue_by_name(
 
 
 def process_msg(msg):
-    search_download_youtube_video(msg)
+    video_list = search_download_youtube_video(msg)
 
-    # TODO upload the downloaded video to your S3 bucket
+    for video in video_list:
+        video_name = video.get('filename')
+        client = boto3.client("s3")
+        client.upload_file(video_name, "lidoror-ex1-bucket", f'video/{video_name}')
+
+        if os.path.exists(video_name):
+            os.remove(video_name)
 
 
 def main():
