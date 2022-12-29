@@ -42,7 +42,7 @@ if __name__ == '__main__':
     bot_to_worker_queue_name = config.get('bot_to_worker_queue_name')
     autoscaling_group_name = config.get('autoscaling_group_name')
 
-    sqs = boto3.resource('sqs')
+    sqs = boto3.resource('sqs', region_name=config.get('aws_region'))
 
     workers_queue = sqs.get_queue_by_name(QueueName=bot_to_worker_queue_name)
     asg_client = boto3.client('autoscaling', region_name=config.get('aws_region'))
