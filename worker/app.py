@@ -22,9 +22,11 @@ def process_msg(msg):
         video_name = video.get('filename')
         client = boto3.client("s3")
         client.upload_file(video_name, "lidoror-ex1-bucket", f'video/{video_name}')
+        logger.info(f'{video_name} was uploaded to S3')
 
         if os.path.exists(video_name):
             os.remove(video_name)
+            logger.info('video was removed from file system')
 
 
 def main():
