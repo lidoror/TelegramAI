@@ -29,7 +29,7 @@ def main():
         backlog_per_instance = calc_backlog_per_instance()
         logger.info(f'backlog per instance: {backlog_per_instance}')
 
-        client = boto3.client('cloudwatch')
+        client = boto3.client('cloudwatch', region_name=config.get('aws_region'))
         client.put_metric_data(backlog_per_instance)
 
         time.sleep(60)
@@ -48,5 +48,3 @@ if __name__ == '__main__':
     asg_client = boto3.client('autoscaling')
 
     main()
-
-
