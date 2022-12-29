@@ -30,7 +30,7 @@ def main():
         logger.info(f'backlog per instance: {backlog_per_instance}')
 
         client = boto3.client('cloudwatch', region_name=config.get('aws_region'))
-        client.put_metric_data(backlog_per_instance)
+        client.put_metric_data(asg_size=backlog_per_instance)
 
         time.sleep(60)
 
