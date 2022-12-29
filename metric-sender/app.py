@@ -29,8 +29,15 @@ def main():
         backlog_per_instance = calc_backlog_per_instance()
         logger.info(f'backlog per instance: {backlog_per_instance}')
 
+        data = [
+            {
+                'MetricName': 'ASG',
+                'Value': backlog_per_instance
+            },
+        ]
+
         client = boto3.client('cloudwatch', region_name=config.get('aws_region'))
-        client.put_metric_data(asg_size=backlog_per_instance)
+        client.put_metric_data(MetricData=data, Namespace='lidoror/asg')
 
         time.sleep(60)
 
