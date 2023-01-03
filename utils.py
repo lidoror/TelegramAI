@@ -9,7 +9,7 @@ def search_download_youtube_video(video_name, num_results=1):
     :return: list of paths to your downloaded video files
     """
     results = []
-    save_location = {'outtmpl': '/temp/%(title)s.%(ext)s'}
+    save_location = {'outtmpl': '/tmp/%(title)s.%(ext)s'}
     with YoutubeDL(save_location) as ydl:
         videos = ydl.extract_info(f"ytsearch{num_results}:{video_name}", download=True)['entries']
 
